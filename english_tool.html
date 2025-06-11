@@ -1,226 +1,307 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>背单词小工具</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: "Helvetica Neue", sans-serif;
-      background-color: #f6f8fa;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .app {
-      width: 360px;
-      max-width: 90vw;
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    }
-    h2 {
-      text-align: center;
-      color: #333;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 8px;
-      background-color: #e0e0e0;
-      color: #333;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    button:hover {
-      background-color: #d3d3d3;
-    }
-    input, textarea {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 16px;
-    }
-    .hidden {
-      display: none;
-    }
-    .word-box {
-      text-align: center;
-      font-size: 20px;
-      margin: 20px 0;
-    }
-    .btn-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    .notice {
-      text-align: center;
-      font-size: 14px;
-      color: #4caf50;
-      margin: 6px 0;
-      opacity: 0;
-      transition: opacity 0.5s ease;
-    }
-    .notice.show {
-      opacity: 1;
-    }
-  </style>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>背单词小工具</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Helvetica Neue", sans-serif;
+            background-color: #f6f8fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .app {
+            width: 360px;
+            max-width: 90vw;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            background-color: #e0e0e0;
+            color: #333;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #d3d3d3;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .word-box {
+            text-align: center;
+            font-size: 20px;
+            margin: 20px 0;
+        }
+
+        .btn-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        #overviewList {
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 15px;
+            line-height: 1.8;
+            padding: 8px;
+        }
+    </style>
 </head>
 <body>
-  <div class="app">
-    <!-- 提示信息 -->
-    <div id="notice" class="notice"></div>
-
+<div class="app">
     <!-- 页面：主页 -->
     <div id="mainPage">
-      <h2>背单词工具</h2>
-      <button onclick="showPage('loadPage')">📁 选择词库</button>
-      <button onclick="showPage('studyPage')">📚 背单词</button>
-      <button onclick="showPage('addPage')">✍️ 添加单词</button>
-      <button onclick="showPage('exportPage')">📤 导出词库</button>
+        <h2>背单词工具</h2>
+        <button onclick="showPage('loadPage')">📁 选择词库</button>
+        <button onclick="showPage('findPage')">🔍 搜索单词</button>
+        <button onclick="showPage('studyPage')">📚 背单词</button>
+        <button onclick="showPage('addPage')">✍️ 添加单词</button>
+        <button onclick="showPage('exportPage')">📤 词库管理</button>
+        <button onclick="showPage('overviewPage'); renderOverview()">📄 单词总览</button>
     </div>
 
     <!-- 页面：选择词库 -->
     <div id="loadPage" class="hidden">
-      <h2>选择词库文件</h2>
-      <input type="file" id="fileInput" accept=".txt" />
-      <button onclick="goBack()">🔙 返回</button>
+        <h2>选择词库文件</h2>
+        <input type="file" id="fileInput" accept=".txt"/>
+        <button onclick="goBack()">🔙 返回</button>
+    </div>
+
+    <!-- 页面：搜索 -->
+    <div id="findPage" class="hidden">
+        <h2>输入搜索的单词</h2>
+        <input id="findInput" placeholder="请输入英文单词"/>
+        <div id="findDisplay" class="word-box"></div>
+        <button onclick="find()">🔍 搜索</button>
+        <button onclick="goBack()">🔙 返回</button>
     </div>
 
     <!-- 页面：背单词 -->
-    <div id="studyPage" class="hidden">
-      <h2>背单词</h2>
-      <div id="wordDisplay" class="word-box">请先选择词库</div>
-      <div id="meanDisplay" class="word-box">请先选择词库</div>
-      <div class="btn-row">
-        <button onclick="prevWord()">⬅️ 上一个</button>
-        <button onclick="nextWord()">➡️ 下一个</button>
-      </div>
-      <button onclick="goBack()">🔙 返回</button>
+    <div id="studyPage" class="hidden" style="position: relative;">
+   <div id="index" class="word-box" style="
+        position: absolute;
+        top: -40px;
+        right: 10px;
+        font-size: 14px;
+        color: #666;
+        background-color: rgba(255,255,255,0.8);
+        padding: 4px 8px;
+        border-radius: 6px;
+        z-index: 999;
+    "></div>
+
+        <h2>背单词</h2>
+        <div id="wordDisplay" class="word-box">请先选择词库</div>
+        <div id="meanDisplay" class="word-box"></div>
+        <div class="btn-row">
+            <button onclick="prevWord()">⬅️ 上一个</button>
+            <button onclick="nextWord()">➡️ 下一个</button>
+        </div>
+        <button onclick="goBack()">🔙 返回</button>
     </div>
 
     <!-- 页面：添加单词 -->
     <div id="addPage" class="hidden">
-      <h2>添加新单词</h2>
-      <input id="newWord" placeholder="请输入英文单词"/>
-      <input id="newMeaning" placeholder="请输入中文意思"/>
-      <button onclick="saveWord()">✅ 保存到本地</button>
-      <button onclick="goBack()">🔙 返回</button>
+        <h2>添加新单词</h2>
+        <input id="newWord" placeholder="请输入英文单词"/>
+        <input id="newMeaning" placeholder="请输入中文意思"/>
+        <button onclick="saveWord()">✅ 保存到本地</button>
+        <button onclick="goBack()">🔙 返回</button>
     </div>
 
     <!-- 页面：导出词库 -->
     <div id="exportPage" class="hidden">
-      <h2>导出词库</h2>
-      <p style="font-size: 14px; color: #666;">合并当前词库与本地添加单词并下载。</p>
-      <button onclick="exportAll()">📁 下载合并词库</button>
-      <button onclick="goBack()">🔙 返回</button>
+        <h2>导出词库</h2>
+        <p style="font-size: 14px; color: #666;">合并当前词库与本地添加单词并下载。</p>
+        <div id="localWordsPreview" style="font-size: 14px; color: #444; margin: 10px 0;"></div>
+        <button onclick="exportAll()">📁 下载合并词库</button>
+        <button onclick="goBack()">🔙 返回</button>
     </div>
-  </div>
 
-  <script>
-    // 页面切换逻辑
-    function showPage(id) {
-      document.querySelectorAll('.app > div').forEach(div => div.classList.add('hidden'));
-      document.getElementById(id).classList.remove('hidden');
-    }
-    function goBack() {
-      showPage('mainPage');
-    }
+    <!-- 页面：单词总览 -->
+    <div id="overviewPage" class="hidden">
+        <h2>词库总览</h2>
+        <div id="overviewList"></div>
+        <button onclick="goBack()">🔙 返回</button>
+    </div>
+</div>
 
-    // 提示信息显示
+<script>
     function showNotice(msg) {
-      const n = document.getElementById('notice');
-      n.textContent = msg;
-      n.classList.add('show');
-      setTimeout(() => n.classList.remove('show'), 2000);
+        alert(msg);
     }
 
-    let txtWords = []; // 仅 txt 文件中的内容
+    function showPage(id) {
+        document.querySelectorAll('.app > div').forEach(div => div.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+
+        if (id === 'studyPage' && txtWords.length > 0) {
+            showCurrentWord();
+        }
+        if (id === 'exportPage') {
+            const localWords = JSON.parse(localStorage.getItem('words') || '[]');
+            const preview = localWords.map(([word, meaning]) => `${word} - ${meaning}`).join('<br>');
+            document.getElementById('localWordsPreview').innerHTML = localWords.length > 0
+                ? `将要合并的本地词条：<br>${preview}`
+                : '当前没有本地新增词条。';
+        }
+
+    }
+
+    function goBack() {
+        showPage('mainPage');
+    }
+
+    let txtWords = []; // 存储词库
     let currentIndex = 0;
 
-    // 读取文件内容
-    document.getElementById('fileInput').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function() {
-        const lines = reader.result.split('\n').map(l => l.trim()).filter(Boolean);
-        txtWords = lines.map(line => line.split(','));
-        currentIndex = 0;
-        showNotice('词库已加载，共 ' + txtWords.length + ' 个单词');
-        showPage('mainPage');
-      };
-      reader.readAsText(file);
+    // 读取 txt 文件
+    document.getElementById('fileInput').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function () {
+            const lines = reader.result.split('\n').map(l => l.trim()).filter(Boolean);
+            txtWords = lines.map(line => line.split(','));
+            currentIndex = 0;
+            showNotice('词库已加载，共 ' + txtWords.length + ' 个单词');
+            showPage('mainPage');
+        };
+        reader.readAsText(file);
     });
 
-    // 显示当前单词
     function showCurrentWord() {
-      if (txtWords.length === 0) {
-        document.getElementById('wordDisplay').textContent = "未加载词库";
-        document.getElementById('meanDisplay').textContent = "未加载词库";
-        return;
-      }
-      const [word, meaning] = txtWords[currentIndex];
-      document.getElementById('wordDisplay').textContent = `${word}`;
-      document.getElementById('meanDisplay').textContent = `${meaning}`;
+        if (txtWords.length === 0) {
+            document.getElementById('wordDisplay').textContent = "未加载词库";
+            document.getElementById('meanDisplay').textContent = "";
+            return;
+        }
+        const [word, meaning] = txtWords[currentIndex];
+        document.getElementById('index').textContent = `${currentIndex+1}/${txtWords.length}`;
+        document.getElementById('wordDisplay').textContent = `${word}`;
+        document.getElementById('meanDisplay').textContent = `${meaning}`;
+    }
+
+    function find() {
+        const findword = document.getElementById('findInput').value.trim().toLowerCase();
+        let found = false;
+        if (txtWords.length === 0) {
+            showNotice('请先选择并加载词库文件');
+            return;
+        }
+        for (let i = 0; i < txtWords.length; i++) {
+            const [word, meaning] = txtWords[i];
+            if (word.toLowerCase() === findword) {
+                document.getElementById('findDisplay').textContent = `${meaning}`;
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            document.getElementById('findDisplay').textContent = "未搜索到此词";
+        }
     }
 
     function nextWord() {
-      if (txtWords.length === 0) return;
-      currentIndex = (currentIndex + 1) % txtWords.length;
-      showCurrentWord();
+        if (txtWords.length === 0) return;
+        currentIndex = (currentIndex + 1) % txtWords.length;
+        showCurrentWord();
     }
 
     function prevWord() {
-      if (txtWords.length === 0) return;
-      currentIndex = (currentIndex - 1 + txtWords.length) % txtWords.length;
-      showCurrentWord();
+        if (txtWords.length === 0) return;
+        currentIndex = (currentIndex - 1 + txtWords.length) % txtWords.length;
+        showCurrentWord();
     }
 
-    document.getElementById('studyPage').addEventListener('transitionstart', showCurrentWord);
+    // 渲染词库总览页面
+    function renderOverview() {
+        const listContainer = document.getElementById('overviewList');
+        if (txtWords.length === 0) {
+            listContainer.textContent = "尚未加载词库";
+            return;
+        }
 
-    // 保存单词到 LocalStorage
+        const html = txtWords.map(([word, meaning], index) => {
+            return `<div><strong>${index + 1}. ${word}</strong>：${meaning}</div>`;
+        }).join('');
+        listContainer.innerHTML = html;
+    }
+
+    // 保存单词到本地
     function saveWord() {
-      const word = document.getElementById('newWord').value.trim();
-      const meaning = document.getElementById('newMeaning').value.trim();
-      if (!word || !meaning) {
-        showNotice('请填写完整信息');
-        return;
-      }
-      const stored = JSON.parse(localStorage.getItem('words') || '[]');
-      stored.push([word, meaning]);
-      localStorage.setItem('words', JSON.stringify(stored));
-      showNotice('已保存到本地');
-      document.getElementById('newWord').value = '';
-      document.getElementById('newMeaning').value = '';
+        const word = document.getElementById('newWord').value.trim();
+        const meaning = document.getElementById('newMeaning').value.trim();
+        if (!word || !meaning) {
+            showNotice('请填写完整信息');
+            return;
+        }
+        const stored = JSON.parse(localStorage.getItem('words') || '[]');
+        stored.push([word, meaning]);
+        localStorage.setItem('words', JSON.stringify(stored));
+        document.getElementById('newWord').value = '';
+        document.getElementById('newMeaning').value = '';
     }
 
-    // 导出词库并清空本地
+    // 导出合并词库
     function exportAll() {
-      const localWords = JSON.parse(localStorage.getItem('words') || '[]');
-      const all = txtWords.concat(localWords);
-      const content = all.map(pair => pair.join(',')).join('\n');
-      const blob = new Blob([content], { type: "text/plain" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'words.txt';
-      a.click();
-
-      // 自动清空 localStorage 添加内容
-      localStorage.removeItem('words');
-      showNotice('词库已导出并清空本地添加');
+        if (txtWords.length === 0) {
+            showNotice('请先选择并加载词库文件');
+            return;
+        }
+        const localWords = JSON.parse(localStorage.getItem('words') || '[]');
+        const all = txtWords.concat(localWords);
+        const content = all.map(pair => pair.join(',')).join('\n');
+        const blob = new Blob([content], {type: "text/plain"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'words.txt';
+        a.click();
+        localStorage.removeItem('words');
+        showNotice('词库已导出并清空本地添加内容');
     }
-  </script>
+    window.addEventListener('beforeunload', function (e) {
+    const localWords = JSON.parse(localStorage.getItem('words') || '[]');
+    if (localWords.length > 0) {
+        e.preventDefault();
+        e.returnValue = '您有尚未导出的本地单词，确定要离开吗？';
+    }
+});
+</script>
 </body>
 </html>
