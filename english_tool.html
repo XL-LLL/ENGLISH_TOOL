@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>背单词小工具</title>
+    <title>我爱背单词</title>
     <style>
         body {
             margin: 0;
@@ -72,6 +72,20 @@
             gap: 10px;
         }
 
+        .tab-bar {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            gap: 6px;
+        }
+
+        .tab-bar button {
+            flex: 1 1 calc(33.33% - 10px); /* 三列 */
+            margin: 0;
+            font-size: 14px;
+            padding: 8px;
+        }
+
         #overviewList {
             max-height: 300px;
             overflow-y: auto;
@@ -83,113 +97,114 @@
 </head>
 <body>
 <div class="app">
-    <!-- 页面：主页 -->
     <div id="mainPage">
-        <h2>背单词工具</h2>
-        <button onclick="showPage('loadPage')">📁 选择词库</button>
-        <button onclick="showPage('findPage')">🔍 搜索单词</button>
-        <button onclick="showPage('studyPage')">📚 背单词</button>
-        <button onclick="showPage('addPage')">✍️ 添加单词</button>
-        <button onclick="showPage('exportPage')">📤 词库管理</button>
-        <button onclick="showPage('overviewPage'); renderOverview()">📄 单词总览</button>
-    </div>
-
-    <!-- 页面：选择词库 -->
-    <div id="loadPage" class="hidden">
-        <h2>选择词库文件</h2>
-        <input type="file" id="fileInput" accept=".txt"/>
-        <button onclick="goBack()">🔙 返回</button>
-    </div>
-
-    <!-- 页面：搜索 -->
-    <div id="findPage" class="hidden">
-        <h2>输入搜索的单词</h2>
-        <input id="findInput" placeholder="请输入英文单词"/>
-        <div id="findDisplay" class="word-box"></div>
-        <button onclick="find()">🔍 搜索</button>
-        <button onclick="goBack()">🔙 返回</button>
-    </div>
-
-    <!-- 页面：背单词 -->
-    <div id="studyPage" class="hidden" style="position: relative;">
-   <div id="index" class="word-box" style="
-        position: absolute;
-        top: -40px;
-        right: 10px;
-        font-size: 14px;
-        color: #666;
-        background-color: rgba(255,255,255,0.8);
-        padding: 4px 8px;
-        border-radius: 6px;
-        z-index: 999;
-    "></div>
-
-        <h2>背单词</h2>
-        <div id="wordDisplay" class="word-box">请先选择词库</div>
-        <div id="meanDisplay" class="word-box"></div>
-        <div class="btn-row">
-            <button onclick="prevWord()">⬅️ 上一个</button>
-            <button onclick="nextWord()">➡️ 下一个</button>
+        <h2>🤡 我爱背单词</h2>
+        <div class="tab-bar">
+            <button onclick="showTab('load')">📁 选择词库</button>
+            <button onclick="showTab('overview')">📄 总览</button>
+            <button onclick="showTab('export')">📤 导出合并</button>
+            <button onclick="showTab('add')">✍️ 添加单词</button>
+            <button onclick="showTab('delete')">❌ 删除单词</button>
+            <button onclick="showTab('edit')">📝 编辑单词</button>
+            <button onclick="showTab('studyPage')">📚 想背单词</button>
+            <button onclick="showTab('findPage')">🔍 搜索单词</button>
+            <button></button>
         </div>
-        <button onclick="goBack()">🔙 返回</button>
-    </div>
 
-    <!-- 页面：添加单词 -->
-    <div id="addPage" class="hidden">
-        <h2>添加新单词</h2>
-        <input id="newWord" placeholder="请输入英文单词"/>
-        <input id="newMeaning" placeholder="请输入中文意思"/>
-        <button onclick="saveWord()">✅ 保存到本地</button>
-        <button onclick="goBack()">🔙 返回</button>
-    </div>
+        <div id="tab-findPage" class="hidden">
+            <input id="findInput" placeholder="请输入英文单词"/>
+            <div id="findDisplay" class="word-box"></div>
+            <button onclick="find()">🔍 搜索</button>
+        </div>
 
-    <!-- 页面：导出词库 -->
-    <div id="exportPage" class="hidden">
-        <h2>导出词库</h2>
-        <p style="font-size: 14px; color: #666;">合并当前词库与本地添加单词并下载。</p>
-        <div id="localWordsPreview" style="font-size: 14px; color: #444; margin: 10px 0;"></div>
-        <button onclick="exportAll()">📁 下载合并词库</button>
-        <button onclick="goBack()">🔙 返回</button>
-    </div>
+        <!-- 页面：背单词 -->
+        <div id="tab-studyPage" class="hidden" style="position: relative;">
+            <div id="index" class="word-box" style="
+            position: absolute;
+            top: -40px;
+            right: 10px;
+            font-size: 14px;
+            color: #666;
+            background-color: rgba(255,255,255,0.8);
+            padding: 4px 8px;
+            border-radius: 6px;
+            z-index: 999;
+        "></div>
+            <div id="wordDisplay" class="word-box">请先选择词库</div>
+            <div id="meanDisplay" class="word-box"></div>
+            <div class="btn-row">
+                <button onclick="prevWord()">⬅️ 上一个</button>
+                <button onclick="nextWord()">➡️ 下一个</button>
+            </div>
 
-    <!-- 页面：单词总览 -->
-    <div id="overviewPage" class="hidden">
-        <h2>词库总览</h2>
-        <div id="overviewList"></div>
-        <button onclick="goBack()">🔙 返回</button>
+        </div>
+
+        <!-- 子页：加载词库 -->
+        <div id="tab-load">
+            <input type="file" id="fileInput" accept=".txt"/>
+        </div>
+
+        <!-- 子页：添加单词 -->
+        <div id="tab-add" class="hidden">
+            <input id="newWord" placeholder="请输入英文单词"/>
+            <input id="newMeaning" placeholder="请输入中文意思"/>
+            <button onclick="saveWord()">✅ 保存到本地</button>
+        </div>
+
+        <!-- 子页：导出词库 -->
+        <div id="tab-export" class="hidden">
+            <p style="font-size: 14px; color: #666;">合并当前词库与本地添加单词并下载。</p>
+            <div id="localWordsPreview" style="font-size: 14px; color: #444; margin: 10px 0;"></div>
+            <button onclick="exportAll()">📁 下载合并词库</button>
+        </div>
+
+        <!-- 子页：词库总览 -->
+        <div id="tab-overview" class="hidden">
+            <div id="overviewList"></div>
+        </div>
+        <!-- 子页：删除单词 -->
+        <div id="tab-delete" class="hidden">
+            <input id="deleteWord" placeholder="请输入要删除的单词"/>
+            <button onclick="deleteWord()">❌ 删除</button>
+        </div>
+
+        <!-- 子页：编辑单词 -->
+        <div id="tab-edit" class="hidden">
+            <input id="editWord" placeholder="请输入要编辑的单词"/>
+            <input id="editMeaning" placeholder="请输入新释义"/>
+            <button onclick="editWord()">📝 修改</button>
+        </div>
     </div>
 </div>
-
 <script>
+    let txtWords = [];
+    let currentIndex = 0;
     function showNotice(msg) {
         alert(msg);
     }
+    // 切换子标签页
+    function showTab(name) {
+        const allTabs = ['load', 'add', 'export', 'overview', 'delete', 'edit', 'findPage', 'studyPage'];
+        allTabs.forEach(n => {
+            const el = document.getElementById('tab-' + n);
+            if (el) el.classList.add('hidden');
+        });
+        document.getElementById('tab-' + name).classList.remove('hidden');
 
-    function showPage(id) {
-        document.querySelectorAll('.app > div').forEach(div => div.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
 
-        if (id === 'studyPage' && txtWords.length > 0) {
-            showCurrentWord();
-        }
-        if (id === 'exportPage') {
+        if (name === 'export') {
             const localWords = JSON.parse(localStorage.getItem('words') || '[]');
             const preview = localWords.map(([word, meaning]) => `${word} - ${meaning}`).join('<br>');
             document.getElementById('localWordsPreview').innerHTML = localWords.length > 0
                 ? `将要合并的本地词条：<br>${preview}`
                 : '当前没有本地新增词条。';
+        } else if (name === 'overview') {
+            renderOverview();
+        } else if (name === 'studyPage' && txtWords.length > 0) {
+            showCurrentWord();
         }
-
     }
 
-    function goBack() {
-        showPage('mainPage');
-    }
-
-    let txtWords = []; // 存储词库
-    let currentIndex = 0;
-
-    // 读取 txt 文件
     document.getElementById('fileInput').addEventListener('change', function (e) {
         const file = e.target.files[0];
         if (!file) return;
@@ -199,7 +214,6 @@
             txtWords = lines.map(line => line.split(','));
             currentIndex = 0;
             showNotice('词库已加载，共 ' + txtWords.length + ' 个单词');
-            showPage('mainPage');
         };
         reader.readAsText(file);
     });
@@ -211,9 +225,9 @@
             return;
         }
         const [word, meaning] = txtWords[currentIndex];
-        document.getElementById('index').textContent = `${currentIndex+1}/${txtWords.length}`;
-        document.getElementById('wordDisplay').textContent = `${word}`;
-        document.getElementById('meanDisplay').textContent = `${meaning}`;
+        document.getElementById('index').textContent = `${currentIndex + 1}/${txtWords.length}`;
+        document.getElementById('wordDisplay').textContent = word;
+        document.getElementById('meanDisplay').textContent = meaning;
     }
 
     function find() {
@@ -248,21 +262,18 @@
         showCurrentWord();
     }
 
-    // 渲染词库总览页面
     function renderOverview() {
         const listContainer = document.getElementById('overviewList');
         if (txtWords.length === 0) {
             listContainer.textContent = "尚未加载词库";
             return;
         }
-
         const html = txtWords.map(([word, meaning], index) => {
             return `<div><strong>${index + 1}. ${word}</strong>：${meaning}</div>`;
         }).join('');
         listContainer.innerHTML = html;
     }
 
-    // 保存单词到本地
     function saveWord() {
         const word = document.getElementById('newWord').value.trim();
         const meaning = document.getElementById('newMeaning').value.trim();
@@ -277,7 +288,6 @@
         document.getElementById('newMeaning').value = '';
     }
 
-    // 导出合并词库
     function exportAll() {
         if (txtWords.length === 0) {
             showNotice('请先选择并加载词库文件');
@@ -295,13 +305,45 @@
         localStorage.removeItem('words');
         showNotice('词库已导出并清空本地添加内容');
     }
-    window.addEventListener('beforeunload', function (e) {
-    const localWords = JSON.parse(localStorage.getItem('words') || '[]');
-    if (localWords.length > 0) {
-        e.preventDefault();
-        e.returnValue = '您有尚未导出的本地单词，确定要离开吗？';
+
+    function deleteWord() {
+        const wordToDelete = document.getElementById('deleteWord').value.trim().toLowerCase();
+        if (!wordToDelete) return showNotice('请输入要删除的单词');
+
+        const index = txtWords.findIndex(([word]) => word.toLowerCase() === wordToDelete);
+        if (index === -1) return showNotice('未找到该单词');
+
+        if (confirm(`确定要删除 ${txtWords[index][0]} 吗？`)) {
+            txtWords.splice(index, 1);
+            showNotice('单词已删除');
+            document.getElementById('deleteWord').value = '';
+            renderOverview();  // 更新总览页
+        }
     }
-});
+
+    function editWord() {
+        const wordToEdit = document.getElementById('editWord').value.trim().toLowerCase();
+        const newMeaning = document.getElementById('editMeaning').value.trim();
+        if (!wordToEdit || !newMeaning) return showNotice('请输入要编辑的单词和新的释义');
+
+        const index = txtWords.findIndex(([word]) => word.toLowerCase() === wordToEdit);
+        if (index === -1) return showNotice('未找到该单词');
+
+        txtWords[index][1] = newMeaning;
+        showNotice('释义已更新');
+        document.getElementById('editWord').value = '';
+        document.getElementById('editMeaning').value = '';
+        renderOverview(); // 更新总览页
+    }
+
+    window.addEventListener('beforeunload', function (e) {
+        const localWords = JSON.parse(localStorage.getItem('words') || '[]');
+        if (localWords.length > 0) {
+            e.preventDefault();
+            e.returnValue = '您有尚未导出的本地单词，确定要离开吗？';
+        }
+    });
+
 </script>
 </body>
 </html>
