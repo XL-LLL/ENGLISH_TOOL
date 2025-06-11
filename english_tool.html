@@ -93,6 +93,45 @@
             line-height: 1.8;
             padding: 8px;
         }
+
+        .shake {
+            animation: shake 0.3s infinite;
+        }
+
+        @keyframes shake {
+            0% {
+                transform: translate(1px, 1px) rotate(0deg);
+            }
+            25% {
+                transform: translate(-1px, -2px) rotate(-1deg);
+            }
+            50% {
+                transform: translate(-3px, 0px) rotate(1deg);
+            }
+            75% {
+                transform: translate(3px, 2px) rotate(0deg);
+            }
+            100% {
+                transform: translate(1px, -1px) rotate(-1deg);
+            }
+        }
+
+        .crazy-button {
+            animation: spin 1s linear infinite;
+            background-color: red !important;
+            color: white !important;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+
     </style>
 </head>
 <body>
@@ -101,14 +140,14 @@
         <h2>🤡 我爱背单词</h2>
         <div class="tab-bar">
             <button onclick="showTab('load')">📁 选择词库</button>
-            <button onclick="showTab('overview')">📄 总览</button>
+            <button onclick="showTab('overview')">📄 单词总览</button>
             <button onclick="showTab('export')">📤 导出合并</button>
             <button onclick="showTab('add')">✍️ 添加单词</button>
             <button onclick="showTab('delete')">❌ 删除单词</button>
             <button onclick="showTab('edit')">📝 编辑单词</button>
-            <button onclick="showTab('studyPage')">📚 想背单词</button>
             <button onclick="showTab('findPage')">🔍 搜索单词</button>
-            <button></button>
+            <button onclick="showTab('studyPage')">📚 想背单词</button>
+            <button onclick="joke()">👀 不要点击</button>
         </div>
 
         <div id="tab-findPage" class="hidden">
@@ -179,9 +218,45 @@
 <script>
     let txtWords = [];
     let currentIndex = 0;
+
     function showNotice(msg) {
         alert(msg);
     }
+
+    function joke() {
+        const body = document.body;
+        const btn = event.target;
+
+        // 暴力视觉效果
+        body.classList.add('shake');
+        btn.classList.add('crazy-button');
+
+        // 页面变色
+        body.style.backgroundColor = '#000';
+        document.querySelectorAll('.app').forEach(div => div.style.background = '#111');
+        document.querySelectorAll('h2').forEach(h => h.style.color = '#0f0');
+
+        // 假装系统警告
+        setTimeout(() => {
+            alert("⚠️ 系统检测到异常行为！");
+        }, 1000);
+
+        // 再加深一步
+        setTimeout(() => {
+            alert("😱 数据即将清除……正在格式化词库！");
+        }, 2500);
+
+        // 突然反转
+        setTimeout(() => {
+            alert("😆 哈哈，开玩笑的！感觉去背单词！");
+            body.classList.remove('shake');
+            btn.classList.remove('crazy-button');
+            body.style.backgroundColor = '#f6f8fa';
+            document.querySelectorAll('.app').forEach(div => div.style.background = 'white');
+            document.querySelectorAll('h2').forEach(h => h.style.color = '#333');
+        }, 4000);
+    }
+
     // 切换子标签页
     function showTab(name) {
         const allTabs = ['load', 'add', 'export', 'overview', 'delete', 'edit', 'findPage', 'studyPage'];
@@ -229,6 +304,7 @@
         document.getElementById('wordDisplay').textContent = word;
         document.getElementById('meanDisplay').textContent = meaning;
     }
+
 
     function find() {
         const findword = document.getElementById('findInput').value.trim().toLowerCase();
