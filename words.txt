@@ -1,4 +1,4 @@
-abolition;废除，废止，取消;空
+abolition;废除，废止，取消;不要背单词了
 abound;大量存在;空
 absent;缺少的，心不在焉的;空
 absord;吸入，理解，同化，吸引，缓冲;空
