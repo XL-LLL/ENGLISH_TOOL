@@ -1,2 +1,19 @@
-hello,你好
-say,说
+abolition;废除，废止，取消;空
+abound;大量存在;空
+absent;缺少的，心不在焉的;空
+absord;吸入，理解，同化，吸引，缓冲;空
+absorption;吸收，专注;空
+abstract;抽象的，理论上的;空
+abundance;大量，充足;空
+access;入口，通道，机会，权力;空
+accessible;可到达的，易理解的，易相处的;空
+account;账户，叙述，说明，客户;空
+account for;解释，说明，占比，对...负责;空
+accountability;责任心;空
+accountable;负有责任的，应作解释的;空
+accountant;会计，会计师;空
+accumulate;积累，积聚;空
+accusation;指控，起诉，谴责;空
+achieve;达到，实现，完成，取得，获得;空
+achievement;成绩，成就，实现，获得;空
+acquire;取得，获得，得到;空
