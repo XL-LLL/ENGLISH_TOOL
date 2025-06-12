@@ -227,9 +227,14 @@
 <script>
     let txtWords = [];
     let currentIndex = 0;
+    let hasUnsavedChanges = false;
+
+
+
     function showNotice(msg) {
         alert(msg);
     }
+
     function joke() {
         const body = document.body;
         const btn = event.target;
@@ -263,6 +268,7 @@
             document.querySelectorAll('h2').forEach(h => h.style.color = '#333');
         }, 4000);
     }
+
     function showTab(name) {
         const allTabs = ['load', 'add', 'export', 'overview', 'delete', 'edit', 'findPage', 'studyPage'];
         allTabs.forEach(n => {
@@ -270,8 +276,6 @@
             if (el) el.classList.add('hidden');
         });
         document.getElementById('tab-' + name).classList.remove('hidden');
-
-
         if (name === 'export') {
             const localWords = JSON.parse(localStorage.getItem('words') || '[]');
             const preview = localWords.map(([word, meaning, memo]) => `${word} : ${meaning} (${memo})`).join('<br>');
@@ -293,10 +297,12 @@
             const lines = reader.result.split('\n').map(l => l.trim()).filter(Boolean);
             txtWords = lines.map(line => line.split(';'));
             currentIndex = 0;
+            hasUnsavedChanges = true;
             showNotice('词库已加载，共 ' + txtWords.length + ' 个单词');
         };
         reader.readAsText(file);
     });
+
     function showCurrentWord() {
         if (txtWords.length === 0) {
             document.getElementById('wordDisplay').textContent = "未加载词库";
@@ -310,6 +316,7 @@
         document.getElementById('meanDisplay').textContent = meaning;
         document.getElementById('studymemoDisplay').textContent = memo;
     }
+
     function find() {
         const findword = document.getElementById('findInput').value.trim().toLowerCase();
         let found = false;
@@ -328,18 +335,22 @@
         }
         if (!found) {
             document.getElementById('findDisplay').textContent = "未搜索到此词";
+            document.getElementById('findmemoDisplay').textContent = "";
         }
     }
+
     function nextWord() {
         if (txtWords.length === 0) return;
         currentIndex = (currentIndex + 1) % txtWords.length;
         showCurrentWord();
     }
+
     function prevWord() {
         if (txtWords.length === 0) return;
         currentIndex = (currentIndex - 1 + txtWords.length) % txtWords.length;
         showCurrentWord();
     }
+
     function renderOverview() {
         const listContainer = document.getElementById('overviewList');
         if (txtWords.length === 0) {
@@ -351,13 +362,15 @@
         }).join('');
         listContainer.innerHTML = html;
     }
+
     function saveWord() {
+
         const word = document.getElementById('newWord').value.trim();
         const meaning = document.getElementById('newMeaning').value.trim();
         let memo = document.getElementById('addmemoMeaning').value.trim();
-         if (memo === '') {
-                memo = '空';
-    }
+        if (memo === '') {
+            memo = '空';
+        }
         if (!word || !meaning) {
             showNotice('请填写完整信息');
             return;
@@ -365,15 +378,19 @@
         const stored = JSON.parse(localStorage.getItem('words') || '[]');
         stored.push([word, meaning, memo]);
         localStorage.setItem('words', JSON.stringify(stored));
+        txtWords.push([word, meaning, memo]);
+        hasUnsavedChanges = true;
         document.getElementById('newWord').value = '';
         document.getElementById('newMeaning').value = '';
         document.getElementById('addmemoMeaning').value = '';
     }
+
     function exportAll() {
         if (txtWords.length === 0) {
             showNotice('请先选择并加载词库文件');
             return;
         }
+
         const localWords = JSON.parse(localStorage.getItem('words') || '[]');
         const all = txtWords.concat(localWords);
         const content = all.map(pair => pair.join(';')).join('\n');
@@ -383,9 +400,11 @@
         a.href = url;
         a.download = 'words.txt';
         a.click();
+        hasUnsavedChanges = false;
         localStorage.removeItem('words');
         showNotice('词库已导出并清空本地添加内容');
     }
+
     function previewDelete() {
         const wordToDelete = document.getElementById('deleteWord').value.trim().toLowerCase();
         if (!wordToDelete) return showNotice('请输入要删除的单词');
@@ -396,10 +415,11 @@
         document.getElementById('deletePreview').textContent = `${index + 1}. ${word}：${meaning} (${memo})`;
 
     }
+
     function deleteWord() {
+
         const wordToDelete = document.getElementById('deleteWord').value.trim().toLowerCase();
         if (!wordToDelete) return showNotice('请输入要删除的单词');
-
         const index = txtWords.findIndex(([word]) => word.toLowerCase() === wordToDelete);
         if (index === -1) return showNotice('未找到该单词');
 
@@ -408,8 +428,10 @@
             showNotice('单词已删除');
             document.getElementById('deleteWord').value = '';
             renderOverview();  // 更新总览页
+            hasUnsavedChanges = true;
         }
     }
+
     function editDelete() {
         const wordToEdit = document.getElementById('editWord').value.trim().toLowerCase();
 
@@ -422,7 +444,9 @@
         document.getElementById('editMemo').value = memo;
 
     }
+
     function editWord() {
+
         const wordToEdit = document.getElementById('editWord').value.trim().toLowerCase();
         const newMeaning = document.getElementById('editMeaning').value.trim();
         const memo = document.getElementById('editMemo').value.trim();
@@ -433,17 +457,18 @@
 
         txtWords[index][1] = newMeaning;
         txtWords[index][2] = memo;
+        hasUnsavedChanges = true;
         showNotice('单词已更新');
         document.getElementById('editWord').value = '';
         document.getElementById('editMeaning').value = '';
         document.getElementById('editMemo').value = '';
         renderOverview(); // 更新总览页
     }
+
     window.addEventListener('beforeunload', function (e) {
-        const localWords = JSON.parse(localStorage.getItem('words') || '[]');
-        if (localWords.length > 0) {
+        if (hasUnsavedChanges) {
             e.preventDefault();
-            e.returnValue = '您有尚未导出的本地单词，确定要离开吗？';
+            e.returnValue = '您有未导出的修改，确定要离开吗？';
         }
     });
 </script>
