@@ -291,13 +291,29 @@
 
     document.getElementById('fileInput').addEventListener('change', function (e) {
         const file = e.target.files[0];
+        let prefilename = ''
+        let index = 0
+        //localStorage.setItem('filename', file.name);
+        const filename = localStorage.getItem('filename');
+        const indexloc = localStorage.getItem('index');
+        if(filename!=null){
+            prefilename = filename;
+        }
+        if(indexloc!=null){
+            index = indexloc;
+        }
         if (!file) return;
         const reader = new FileReader();
         reader.onload = function () {
             const lines = reader.result.split('\n').map(l => l.trim()).filter(Boolean);
             txtWords = lines.map(line => line.split(';'));
-            currentIndex = 0;
-            hasUnsavedChanges = true;
+            localStorage.setItem('filename', file.name);
+
+            if(file.name===prefilename){
+                currentIndex = Number(index)
+            }else {
+                currentIndex = 0
+            }
             showNotice('词库已加载，共 ' + txtWords.length + ' 个单词');
         };
         reader.readAsText(file);
@@ -342,12 +358,14 @@
     function nextWord() {
         if (txtWords.length === 0) return;
         currentIndex = (currentIndex + 1) % txtWords.length;
+         localStorage.setItem('index', currentIndex);
         showCurrentWord();
     }
 
     function prevWord() {
         if (txtWords.length === 0) return;
         currentIndex = (currentIndex - 1 + txtWords.length) % txtWords.length;
+        localStorage.setItem('index', currentIndex);
         showCurrentWord();
     }
 
